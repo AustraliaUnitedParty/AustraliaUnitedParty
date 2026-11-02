@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Private membership administration workspace for Australia United Party">
+  <title>Australia United Party | Membership Workspace</title>
+  <link rel="stylesheet" href="/style.css">
+  <script defer src="/app.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><div class="mark">AU</div><div><strong>Australia United Party</strong><small>Membership & AEC preparation workspace</small></div></div>
+  <div id="userArea"></div>
+</header>
+<main class="wrap">
+  <section id="loginPanel" class="panel narrow">
+    <h1>Sign in</h1><p class="muted">Authorised party administrators only.</p>
+    <form id="loginForm">
+      <label>Username<input name="username" autocomplete="username" required></label>
+      <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
+      <button class="primary">Sign in</button><p id="loginError" class="error"></p>
+    </form>
+  </section>
+  <section id="appPanel" hidden>
+    <div class="hero">
+      <div><p class="eyebrow">FEDERAL PARTY REGISTRATION SUPPORT</p><h1>Membership overview</h1>
+      <p class="muted">Private workspace for genuine member records, consent tracking and preparation of AEC materials.</p></div>
+      <a class="outline" href="https://www.aec.gov.au/Parties_and_Representatives/party_registration/" target="_blank" rel="noopener">Official AEC guidance ↗</a>
+    </div>
+    <div class="cards" id="stats"></div>
+    <div class="grid">
+      <section class="panel">
+        <div class="sectionhead"><h2>Register a member</h2><span class="tag">Australian format</span></div>
+        <form id="memberForm" class="formgrid">
+          <label>Title<input name="title" maxlength="20"></label>
+          <label>Given name(s) *<input name="given_names" required maxlength="100"></label>
+          <label>Surname *<input name="surname" required maxlength="100"></label>
+          <label>Date of birth *<input name="dob" type="date" required></label>
+          <label class="wide">Residential address line 1 *<input name="address_line1" required maxlength="150"></label>
+          <label class="wide">Residential address line 2<input name="address_line2" maxlength="150"></label>
+          <label>Suburb / Town *<input name="suburb" required></label>
+          <label>State / Territory *<select name="state" required><option value="">Choose</option><option>ACT</option><option>NSW</option><option>NT</option><option>QLD</option><option>SA</option><option>TAS</option><option>VIC</option><option>WA</option></select></label>
+          <label>Postcode *<input name="postcode" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" required></label>
+          <label>Email<input name="email" type="email"></label>
+          <label>Phone<input name="phone" type="tel"></label>
+          <div class="wide declaration">
+            <p><strong>Member declarations and consent</strong></p>
+            <label class="check"><input type="checkbox" name="enrolled_voter" required> I declare that I am enrolled to vote in an Australian federal election.</label>
+            <label class="check"><input type="checkbox" name="supports_registration" required> I support the application to register Australia United Party as a federal political party.</label>
+            <label class="check"><input type="checkbox" name="not_counted_for_other_party" required> I declare that I am not being relied upon as a supporting member for another party's registration.</label>
+            <label class="check"><input type="checkbox" name="consent_to_membership" required> I consent to becoming a member of Australia United Party.</label>
+            <label class="check"><input type="checkbox" name="privacy_acknowledged" required> I have read the party privacy notice and consent to the collection and use of my information for membership administration and lawful party-registration purposes.</label>
+            <label>Type full name as electronic declaration *<input name="declaration_name" required maxlength="150"></label>
+            <label>Declaration date *<input name="declaration_date" type="date" required></label>
+          </div>
+          <label class="wide">Internal notes (do not enter sensitive or classified information)<textarea name="notes" rows="2" maxlength="1000"></textarea></label>
+          <div class="wide"><button class="primary">Save member record</button><span id="memberMessage" class="message"></span></div>
+        </form>
+      </section>
+      <section class="panel">
+        <div class="sectionhead"><h2>Member records</h2><button id="exportBtn" class="outline">Export AEC-oriented CSV</button></div>
+        <div class="filters"><input id="search" placeholder="Search name or member ID"><select id="statusFilter"><option value="">All statuses</option><option>active</option><option>pending</option><option>incomplete</option><option>reserve</option><option>selected</option><option>withdrawn</option></select></div>
+        <div class="tablewrap"><table><thead><tr><th>Member ID</th><th>Name</th><th>Location</th><th>Status</th><th>Action</th></tr></thead><tbody id="memberRows"></tbody></table></div>
+        <p class="small muted">For privacy, only authorised users can access member details. Search displays a limited list.</p>
+      </section>
+    </div>
+    <section class="panel">
+      <div class="sectionhead"><h2>Administration</h2><span class="muted small">Access depends on your assigned role.</span></div>
+      <div class="adminlinks">
+        <a href="/api/audit" id="auditLink" target="_blank" rel="noopener">View audit log (JSON)</a>
+        <a href="https://www.aec.gov.au/Parties_and_Representatives/party_registration/" target="_blank" rel="noopener">AEC registration forms and guide ↗</a>
+        <a href="https://www.aec.gov.au/Enrolling_to_vote/Enrolment_options/" target="_blank" rel="noopener">AEC enrolment information ↗</a>
+      </div>
+    </section>
+    <p class="footnote">This is an independent administrative tool, not an AEC system. It does not verify electoral enrolment, determine legal eligibility or lodge an application with the AEC.</p>
+  </section>
+</main>
+<footer>Australia United Party · Private administrative workspace · DD/MM/YYYY · AUD</footer>
+</body></html>
