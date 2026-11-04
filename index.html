@@ -1,79 +1,198 @@
-<!doctype html>
-<html lang="en-AU">
-<head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Private membership administration workspace for Australia United Party">
-  <title>Australia United Party | Membership Workspace</title>
-  <link rel="stylesheet" href="/style.css">
-  <script defer src="/app.js"></script>
-</head>
-<body>
-<header class="topbar">
-  <div class="brand"><div class="mark">AU</div><div><strong>Australia United Party</strong><small>Membership & AEC preparation workspace</small></div></div>
-  <div id="userArea"></div>
+<title>Insolvency Radar</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0c5c7a">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: summary strip, one filter row, then a grid of company cards; each card ends with the appointed practitioner and ways to find their contact details */
+:root{
+  --bg:#f3f5f7; --surface:#ffffff; --fg:#14202b; --mute:#566573; --line:#dde3e9;
+  --accent:#0c5c7a; --warn:#8a4f00; --warn-bg:#fdf1dc;
+  --cL:#8a2b2b; --cL-bg:#f9e6e4; --cA:#0c5c7a; --cA-bg:#e1f0f5; --cR:#7a4b0c; --cR-bg:#f6ecdc;
+  --cS:#5b4a8a; --cS-bg:#ece8f6; --new:#1d6b3a; --new-bg:#e2f1e6;
+  --sans:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e151b; --surface:#16202a; --fg:#e6edf3; --mute:#97a6b4; --line:#26333f;
+  --accent:#5cb8d6; --warn:#f0b45a; --warn-bg:#33270f;
+  --cL:#f0a0a0; --cL-bg:#3a1c1c; --cA:#7cc9e0; --cA-bg:#12303b; --cR:#e8c28a; --cR-bg:#33280f;
+  --cS:#c1b3ee; --cS-bg:#2a2340; --new:#8fd3a2; --new-bg:#163323; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e151b; --surface:#16202a; --fg:#e6edf3; --mute:#97a6b4; --line:#26333f;
+  --accent:#5cb8d6; --warn:#f0b45a; --warn-bg:#33270f;
+  --cL:#f0a0a0; --cL-bg:#3a1c1c; --cA:#7cc9e0; --cA-bg:#12303b; --cR:#e8c28a; --cR-bg:#33280f;
+  --cS:#c1b3ee; --cS-bg:#2a2340; --new:#8fd3a2; --new-bg:#163323; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 var(--sans);
+  padding-block:0 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1100px;margin:0 auto}
+header{padding-block:24px 4px}
+h1{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+header p{margin:6px 0 0;color:var(--mute);max-width:68ch}
+.stats{display:flex;flex-wrap:wrap;gap:8px 22px;margin:16px 0 0;padding:0;list-style:none;font-size:14px;color:var(--mute)}
+.stats b{color:var(--fg);font-variant-numeric:tabular-nums;font-size:18px;font-weight:600;margin-right:4px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;padding-block:16px}
+.bar>*{min-width:0}
+input,select,button{font:inherit}
+input,select{color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:8px 10px}
+input{flex:1 1 260px}
+input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.note{margin:0 0 8px;background:var(--warn-bg);color:var(--warn);font-size:13px;padding:6px 10px;border-radius:4px}
+.count{margin:0 0 12px;color:var(--mute);font-size:13px;font-variant-numeric:tabular-nums}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card h2{margin:0;font-size:16px;font-weight:600;overflow-wrap:anywhere}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:12px;font-weight:500;padding:2px 8px;border-radius:99px;letter-spacing:.02em}
+.k-L{background:var(--cL-bg);color:var(--cL)}.k-A{background:var(--cA-bg);color:var(--cA)}
+.k-R,.k-O,.k-E{background:var(--cR-bg);color:var(--cR)}.k-S{background:var(--cS-bg);color:var(--cS)}
+.t-new{background:var(--new-bg);color:var(--new)}
+.t-line{border:1px solid var(--line);color:var(--mute)}
+.ids{font-family:var(--mono);font-size:12px;color:var(--mute);overflow-wrap:anywhere}
+.meta{font-size:13px;color:var(--mute)}
+.meta strong{color:var(--fg);font-weight:500}
+.who{margin-top:auto;border-top:1px solid var(--line);padding-top:10px;display:grid;gap:6px}
+.label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--mute)}
+.pname{font-weight:600}
+.firm{font-size:13px;color:var(--mute)}
+.who p{margin:0;font-size:13px;color:var(--mute)}
+.actions{display:flex;flex-wrap:wrap;gap:6px}
+.btn{font-size:13px;color:var(--accent);background:transparent;border:1px solid var(--line);border-radius:4px;padding:3px 10px;cursor:pointer;text-decoration:none}
+.btn:hover{border-color:var(--accent)}
+.more{display:block;margin:20px auto 0;padding:8px 20px;background:var(--surface);color:var(--accent);border:1px solid var(--line);border-radius:6px;cursor:pointer}
+.empty{padding:32px 0;color:var(--mute)}
+footer{margin-top:32px;padding-top:16px;border-top:1px solid var(--line);font-size:12px;color:var(--mute);max-width:84ch;display:grid;gap:6px}
+footer p{margin:0}
+footer a{color:var(--accent)}
+</style>
+
+<div class="wrap">
+<header>
+  <h1>Insolvency Radar</h1>
+  <p>Australian companies in liquidation, administration, receivership or strike-off, from ASIC's open data. Each card names the appointed practitioner where ASIC lists one.</p>
+  <ul class="stats" id="stats"></ul>
 </header>
-<main class="wrap">
-  <section id="loginPanel" class="panel narrow">
-    <h1>Sign in</h1><p class="muted">Authorised party administrators only.</p>
-    <form id="loginForm">
-      <label>Username<input name="username" autocomplete="username" required></label>
-      <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
-      <button class="primary">Sign in</button><p id="loginError" class="error"></p>
-    </form>
-  </section>
-  <section id="appPanel" hidden>
-    <div class="hero">
-      <div><p class="eyebrow">FEDERAL PARTY REGISTRATION SUPPORT</p><h1>Membership overview</h1>
-      <p class="muted">Private workspace for genuine member records, consent tracking and preparation of AEC materials.</p></div>
-      <a class="outline" href="https://www.aec.gov.au/Parties_and_Representatives/party_registration/" target="_blank" rel="noopener">Official AEC guidance ↗</a>
-    </div>
-    <div class="cards" id="stats"></div>
-    <div class="grid">
-      <section class="panel">
-        <div class="sectionhead"><h2>Register a member</h2><span class="tag">Australian format</span></div>
-        <form id="memberForm" class="formgrid">
-          <label>Title<input name="title" maxlength="20"></label>
-          <label>Given name(s) *<input name="given_names" required maxlength="100"></label>
-          <label>Surname *<input name="surname" required maxlength="100"></label>
-          <label>Date of birth *<input name="dob" type="date" required></label>
-          <label class="wide">Residential address line 1 *<input name="address_line1" required maxlength="150"></label>
-          <label class="wide">Residential address line 2<input name="address_line2" maxlength="150"></label>
-          <label>Suburb / Town *<input name="suburb" required></label>
-          <label>State / Territory *<select name="state" required><option value="">Choose</option><option>ACT</option><option>NSW</option><option>NT</option><option>QLD</option><option>SA</option><option>TAS</option><option>VIC</option><option>WA</option></select></label>
-          <label>Postcode *<input name="postcode" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" required></label>
-          <label>Email<input name="email" type="email"></label>
-          <label>Phone<input name="phone" type="tel"></label>
-          <div class="wide declaration">
-            <p><strong>Member declarations and consent</strong></p>
-            <label class="check"><input type="checkbox" name="enrolled_voter" required> I declare that I am enrolled to vote in an Australian federal election.</label>
-            <label class="check"><input type="checkbox" name="supports_registration" required> I support the application to register Australia United Party as a federal political party.</label>
-            <label class="check"><input type="checkbox" name="not_counted_for_other_party" required> I declare that I am not being relied upon as a supporting member for another party's registration.</label>
-            <label class="check"><input type="checkbox" name="consent_to_membership" required> I consent to becoming a member of Australia United Party.</label>
-            <label class="check"><input type="checkbox" name="privacy_acknowledged" required> I have read the party privacy notice and consent to the collection and use of my information for membership administration and lawful party-registration purposes.</label>
-            <label>Type full name as electronic declaration *<input name="declaration_name" required maxlength="150"></label>
-            <label>Declaration date *<input name="declaration_date" type="date" required></label>
-          </div>
-          <label class="wide">Internal notes (do not enter sensitive or classified information)<textarea name="notes" rows="2" maxlength="1000"></textarea></label>
-          <div class="wide"><button class="primary">Save member record</button><span id="memberMessage" class="message"></span></div>
-        </form>
-      </section>
-      <section class="panel">
-        <div class="sectionhead"><h2>Member records</h2><button id="exportBtn" class="outline">Export AEC-oriented CSV</button></div>
-        <div class="filters"><input id="search" placeholder="Search name or member ID"><select id="statusFilter"><option value="">All statuses</option><option>active</option><option>pending</option><option>incomplete</option><option>reserve</option><option>selected</option><option>withdrawn</option></select></div>
-        <div class="tablewrap"><table><thead><tr><th>Member ID</th><th>Name</th><th>Location</th><th>Status</th><th>Action</th></tr></thead><tbody id="memberRows"></tbody></table></div>
-        <p class="small muted">For privacy, only authorised users can access member details. Search displays a limited list.</p>
-      </section>
-    </div>
-    <section class="panel">
-      <div class="sectionhead"><h2>Administration</h2><span class="muted small">Access depends on your assigned role.</span></div>
-      <div class="adminlinks">
-        <a href="/api/audit" id="auditLink" target="_blank" rel="noopener">View audit log (JSON)</a>
-        <a href="https://www.aec.gov.au/Parties_and_Representatives/party_registration/" target="_blank" rel="noopener">AEC registration forms and guide ↗</a>
-        <a href="https://www.aec.gov.au/Enrolling_to_vote/Enrolment_options/" target="_blank" rel="noopener">AEC enrolment information ↗</a>
-      </div>
-    </section>
-    <p class="footnote">This is an independent administrative tool, not an AEC system. It does not verify electoral enrolment, determine legal eligibility or lodge an application with the AEC.</p>
-  </section>
-</main>
-<footer>Australia United Party · Private administrative workspace · DD/MM/YYYY · AUD</footer>
-</body></html>
+<div class="bar">
+  <input id="q" type="search" placeholder="Search company, ACN, practitioner, suburb or postcode" aria-label="Search" autocomplete="off">
+  <select id="state" aria-label="State"><option value="">All states</option><option>NSW</option><option>VIC</option><option>QLD</option><option>WA</option><option>SA</option><option>TAS</option><option>ACT</option><option>NT</option></select>
+  <select id="kind" aria-label="Type">
+    <option value="">All types</option><option value="L">Liquidation</option><option value="A">Administration</option>
+    <option value="R">Receivership or controller</option><option value="E">In external administration (older appointment)</option><option value="S">Strike-off in progress</option>
+  </select>
+  <select id="period" aria-label="Appointed"><option value="">Any date</option><option value="30">Last 30 days</option><option value="90">Last 90 days</option><option value="365">Last 12 months</option></select>
+</div>
+<p class="note" id="note" hidden></p>
+<p class="note" id="warn" hidden></p>
+<p class="count" id="count" aria-live="polite"></p>
+<div class="grid" id="out"></div>
+<button class="more" id="more" type="button" hidden>Show more</button>
+<footer>
+  <p>Sources: <a href="https://asic.gov.au/regulatory-resources/find-a-document/statistics/insolvency-statistics/insolvency-statistics-series-1-companies-entering-external-administration/" target="_blank" rel="noopener">ASIC insolvency statistics (Series 1 and 2)</a>,
+  <a href="https://www.data.gov.au/data/dataset/asic-companies" target="_blank" rel="noopener">ASIC Company Dataset</a> and
+  <a href="https://data.gov.au/data/dataset/asic-liquidator" target="_blank" rel="noopener">ASIC Liquidator Dataset</a>, published by the Australian Securities and Investments Commission. The two datasets on data.gov.au are licensed
+  <a href="https://creativecommons.org/licenses/by/3.0/au/" target="_blank" rel="noopener">CC BY 3.0 AU</a>.</p>
+  <p>ASIC publishes these weekly and the appointment records run about two weeks behind, so recent events may be missing. ASIC's data names the appointee but gives no phone or email. A firm name appears only when the appointee matches one registered liquidator exactly. Always confirm the appointment in ASIC's published notice before acting.</p>
+  <p>This site is independent and not endorsed by ASIC. It is not legal or financial advice.</p>
+</footer>
+</div>
+
+<script>
+var PAGE=60, shown=PAGE, DATA=[], META={};
+var KIND={L:"Liquidation",A:"Administration",R:"Receivership or controller",O:"External administration",E:"In external administration",S:"Strike-off in progress"};
+var STATUS={EXAD:"Status: in external administration",SOFF:"Status: strike-off in progress",REGD:"Status: registered",DRGD:"Status: deregistered",NOAC:"Status: not active"};
+var NOTICES="https://publishednotices.asic.gov.au/browsesearch-notices/";
+var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+var SRC={appointments:"appointment records",company_status:"company status",liquidator_register:"liquidator register"};
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function n0(n){return Number(n||0).toLocaleString("en-AU")}
+function acnFmt(a){return a&&a.length===9?a.slice(0,3)+" "+a.slice(3,6)+" "+a.slice(6):a||""}
+function abnFmt(b){return b&&b.length===11?b.slice(0,2)+" "+b.slice(2,5)+" "+b.slice(5,8)+" "+b.slice(8):b||""}
+function fmt(d){if(!d)return"";var p=d.split("-");return p.length===3?(+p[2])+" "+MON[+p[1]-1]+" "+p[0]:d}
+function daysAgo(d){return (Date.now()-new Date(d+"T00:00:00Z").getTime())/864e5}
+function isNew(r){return META.baseline&&r.f>META.baseline&&daysAgo(r.f)<=14}
+function filtered(){
+  var q=$("q").value.trim().toLowerCase(), st=$("state").value, k=$("kind").value, pd=+$("period").value||0;
+  return DATA.filter(function(r){
+    if(st&&r.st!==st)return false;
+    if(k&&r.k!==k&&!(k==="R"&&r.k==="O"))return false;
+    if(pd&&!(r.d&&daysAgo(r.d)<=pd))return false;
+    return !q||r._q.indexOf(q)>-1;
+  });
+}
+function who(r){
+  var h='<div class="who"><span class="label">Appointed practitioner</span>';
+  if(r.ap){
+    h+='<span class="pname">'+esc(r.ap)+'</span>';
+    if(r.fm)h+='<span class="firm">'+esc(r.fm)+(r.pt?' · '+esc(r.pt):'')+' (ASIC register of liquidators)</span>';
+    h+='<p>ASIC’s data gives the name only. Find the phone or email through the firm, or in the published notice.</p>';
+  }else if(r.d){
+    h+='<p>No appointee is named in ASIC’s data for this company. The published notice names them.</p>';
+  }else{
+    h+='<p>The appointee and contact details are in ASIC’s published notice. Copy the ACN and search for it there.</p>';
+  }
+  h+='<div class="actions"><button class="btn" type="button" data-acn="'+esc(r.a)+'">Copy ACN</button>'+
+     '<a class="btn" href="'+NOTICES+'" target="_blank" rel="noopener">ASIC notices ↗</a>';
+  if(r.ap)h+='<a class="btn" href="https://www.google.com/search?q='+encodeURIComponent(r.ap+' '+(r.fm||'liquidator')+' contact')+'" target="_blank" rel="noopener">Search practitioner ↗</a>';
+  if(r.b)h+='<a class="btn" href="https://abr.business.gov.au/ABN/View?abn='+esc(r.b)+'" target="_blank" rel="noopener">ABN Lookup ↗</a>';
+  return h+'</div></div>';
+}
+function card(r){
+  var kind=r.p||KIND[r.k]||"", loc=[r.ar,r.st,r.pc].filter(Boolean).join(" ");
+  var ids='ACN '+esc(acnFmt(r.a))+(r.b?' · ABN '+esc(abnFmt(r.b)):'');
+  var meta=[];
+  if(loc)meta.push('<strong>'+esc(loc)+'</strong>');
+  if(r["in"])meta.push(esc(r["in"]));
+  var when=r.d?'Appointed '+esc(fmt(r.d))+(r.na>1?' ('+r.na+' appointments in period)':''):'Added to radar '+esc(fmt(r.f));
+  return '<article class="card"><h2>'+esc(r.n)+'</h2>'+
+  '<div class="tags"><span class="tag k-'+esc(r.k||"O")+'">'+esc(kind)+'</span>'+
+  (r.s&&STATUS[r.s]?'<span class="tag t-line">'+esc(STATUS[r.s])+'</span>':'')+(isNew(r)?'<span class="tag t-new">New</span>':'')+'</div>'+
+  '<div class="ids">'+ids+'</div>'+
+  (meta.length?'<div class="meta">'+meta.join(' · ')+'</div>':'')+
+  '<div class="meta">'+when+'</div>'+who(r)+'</article>';
+}
+function render(){
+  var rows=filtered(), part=rows.slice(0,shown);
+  $("count").textContent=n0(rows.length)+" of "+n0(DATA.length)+" companies";
+  $("out").innerHTML=part.length?part.map(card).join(""):'<p class="empty">No companies match. Try a shorter name or clear a filter.</p>';
+  $("more").hidden=rows.length<=shown;
+  $("more").textContent="Show "+n0(Math.min(PAGE,rows.length-shown))+" more";
+}
+function stats(){
+  if(META.sample){$("stats").innerHTML="";return}
+  var rec=DATA.filter(function(r){return r.d&&daysAgo(r.d)<=30}).length;
+  var named=DATA.filter(function(r){return r.ap}).length;
+  $("stats").innerHTML='<li><b>'+n0(DATA.length)+'</b>companies listed</li>'+
+    '<li><b>'+n0(rec)+'</b>appointed in the last 30 days</li>'+
+    '<li><b>'+n0(named)+'</b>with a named practitioner</li>';
+}
+function warn(){
+  var s=META.sources||{}, bad=Object.keys(s).filter(function(k){return s[k]!=="ok"});
+  if(!bad.length||META.sample){$("warn").hidden=true;return}
+  $("warn").hidden=false;
+  $("warn").textContent="Some data could not be collected this week ("+bad.map(function(k){return SRC[k]||k}).join(", ")+"). Records may be incomplete or out of date.";
+}
+function load(){
+  fetch("leads.json?v="+Date.now()).then(function(r){return r.json()}).then(function(j){
+    META=j.meta||{}; DATA=j.leads||[];
+    DATA.forEach(function(r){r._q=[r.n,r.a,r.ap,r.fm,r.ar,r.pc,r["in"]].join(" ").toLowerCase()});
+    var note=$("note"); note.hidden=false;
+    note.textContent=META.sample?"These are fictional sample records. Real companies appear after the first weekly update.":"Data updated "+(META.updated||"unknown")+". Covers appointments from the last "+(META.months||12)+" months.";
+    stats(); warn(); render();
+  }).catch(function(){$("count").textContent="Could not load data. Reload the page."});
+}
+var timer;
+$("q").addEventListener("input",function(){clearTimeout(timer);timer=setTimeout(function(){shown=PAGE;render()},150)});
+["state","kind","period"].forEach(function(id){$(id).addEventListener("change",function(){shown=PAGE;render()})});
+$("more").addEventListener("click",function(){shown+=PAGE;render()});
+document.addEventListener("click",function(e){
+  var b=e.target.closest("button[data-acn]"); if(!b)return;
+  var txt=acnFmt(b.getAttribute("data-acn")), old=b.textContent;
+  function done(ok){b.textContent=ok?"Copied":"Select the ACN above";setTimeout(function(){b.textContent=old},1600)}
+  try{navigator.clipboard.writeText(txt).then(function(){done(true)},function(){done(false)})}catch(x){done(false)}
+});
+if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(function(){})}
+load();
+</script>
